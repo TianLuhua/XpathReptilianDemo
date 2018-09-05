@@ -64,14 +64,11 @@ public class APPBean {
 
     @Override
     public String toString() {
-        return "APPBean{" +
-                "name='" + name + '\'' +
-                ", loadCount=" + loadCount +
-                ", loadCount_='" + loadCount_ + '\'' +
-                ", detailsPath='" + detailsPath + '\'' +
-                ", version='" + version + '\'' +
-                ", developer='" + developer + '\'' +
-                '}';
+        return
+                "名字：" + name  +
+                ", 下载量：" + loadCount_ +
+                ", Android版本要求：" + version  +
+                ", 开发公司：" + developer  ;
     }
 }
 

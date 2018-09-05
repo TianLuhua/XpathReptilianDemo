@@ -42,7 +42,7 @@ public class DemoApplication {
     @RequestMapping("/list")
     @ResponseBody
     public static void list() throws Exception {
-        String listUrl = "https://www.wandoujia.com/search/9891950679460233267";
+        String listUrl = "https://www.wandoujia.com/search/"+Config.ID;
         HttpGet httpGet = new HttpGet(listUrl);
         HttpResponse response = httpClient.execute(httpGet);
         Html html = new Html(getHtml(response));
@@ -50,7 +50,7 @@ public class DemoApplication {
         pages = html.xpath("//*ul[@id=j-search-list]/div/div/a[@class=page-item]").nodes().size() - 2;
 
         for (int i = 1; i <= pages; i++) {
-            listUrl = "https://www.wandoujia.com/search/9891950679460233267_page" + i;
+            listUrl = "https://www.wandoujia.com/search/"+Config.ID+Config.PAGE + i;
             doRequest(listUrl);
 
             if (i == pages)

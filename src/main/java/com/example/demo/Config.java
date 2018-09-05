@@ -6,9 +6,10 @@ public class Config {
      * 豌豆荚相关路径
      */
     //搜索界面的根路径
-    final String rootPath = "https://www.wandoujia.com/search/";
+    final static String rootPath = "https://www.wandoujia.com/search/";
     //详情界面的根路径
-    final String detailsRootPath = "https://www.wandoujia.com/apps/";
+    final static String ID = "14232182728454798196";
+    final static String PAGE = "_page";
 
     /**
      * 应用宝相关路径
