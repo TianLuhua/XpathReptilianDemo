@@ -20,14 +20,14 @@ public class Config {
      * 应用宝相关路径
      */
 
-    /**
+    /**PAGE_INDEX_WANDOUJIA
      * 360相关路径
      */
     final static String ROOTPATH_360 = "http://zhushou.360.cn/search/index/?kw=";
     //获取当前返回的数据页数的 关键字符
-    final static String PAGE_INDEX_360 = "//*ul[@id=j-search-list]/div/div/a[@class=page-item]";
+    final static String PAGE_INDEX_360 = "//*script[@type=text/javascript]";
     //获取当前页面有多少条数据的 关键字符
-    final static String CONTENT_INDEX_360 = "//*ul[@id=j-search-list]/li/div[@class=app-desc]";
+    final static String CONTENT_INDEX_360 = "//*ul";
     //需要搜索apk的类型
     final static String KEY_ID_360 = "早教";
     //同一类型的page前缀

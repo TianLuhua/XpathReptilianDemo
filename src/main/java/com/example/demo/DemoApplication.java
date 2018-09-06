@@ -44,9 +44,21 @@ public class DemoApplication {
     @RequestMapping("/list")
     @ResponseBody
     public static void list() throws Exception {
-        dorootRequst(ROOTPATH_WANDOUJIA + Config.KEY_ID_WANDOUJIA, PAGE_INDEX_WANDOUJIA, CONTENT_INDEX_WANDOUJIA);
+//        dorootRequst(ROOTPATH_WANDOUJIA + Config.KEY_ID_WANDOUJIA, PAGE_INDEX_WANDOUJIA, CONTENT_INDEX_WANDOUJIA);
+        get360Page();
     }
 
+
+
+    public static void get360Page()throws Exception{
+        HttpGet httpGet = new HttpGet(ROOTPATH_360+KEY_ID_360);
+        HttpResponse response = httpClient.execute(httpGet);
+        Html html = new Html(getHtml(response));
+//        System.out.println(html.toString());
+        List<Selectable> list=html.xpath(CONTENT_INDEX_360).nodes();
+        System.out.println("=========================");
+        System.out.println(list.toString());
+    }
 
     /**
      * 豌豆荚页面请求
