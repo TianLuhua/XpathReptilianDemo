@@ -25,9 +25,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.example.demo.Config.ROOTPATH;
-import static com.example.demo.Config.WANDOUJIA_LIST_INDEX;
-import static com.example.demo.Config.WANDOUJIA_PAGE_INDEX;
+import static com.example.demo.Config.*;
 
 @SpringBootApplication
 @Controller
@@ -46,35 +44,26 @@ public class DemoApplication {
     @RequestMapping("/list")
     @ResponseBody
     public static void list() throws Exception {
-        doWandoujiaRequest(ROOTPATH + Config.KEY_ID, WANDOUJIA_PAGE_INDEX, WANDOUJIA_LIST_INDEX);
+        dorootRequst(ROOTPATH_WANDOUJIA + Config.KEY_ID_WANDOUJIA, PAGE_INDEX_WANDOUJIA, CONTENT_INDEX_WANDOUJIA_);
     }
 
-    /**
-     * 360页面请求
-     *
-     * @throws Exception
-     */
-    public static void do360Requst() throws Exception {
-
-
-    }
 
     /**
      * 豌豆荚页面请求
      *
-     * @param indexString  从html数据中获取当前返回数据页数的 indexString，比如：//*ul[@id=j-search-list]/div/div/a[@class=page-item]
+     * @param pageIndex    从html数据中获取当前返回数据页数的 indexString，比如：//*ul[@id=j-search-list]/div/div/a[@class=page-item]
      * @param contentIndex 具体获取apk内容的 关键字符串："//*ul[@id=j-search-list]/li/div[@class=app-desc]"
      * @throws Exception
      */
-    public static void doWandoujiaRequest(String rootUrl, String indexString, String contentIndex) throws Exception {
+    public static void dorootRequst(String rootUrl, String pageIndex, String contentIndex) throws Exception {
         HttpGet httpGet = new HttpGet(rootUrl);
         HttpResponse response = httpClient.execute(httpGet);
         Html html = new Html(getHtml(response));
         //获取当前返回数据的页数
-        pages = html.xpath(indexString).nodes().size() - 2;
+        pages = html.xpath(pageIndex).nodes().size() - 2;
         appBeans.clear();
         for (int i = 1; i <= pages; i++) {
-            String pageUrl = rootUrl + Config.PAGE + i;
+            String pageUrl = rootUrl + Config.PAGE_WANDOUJIA + i;
             doRequest(pageUrl, contentIndex);
             if (i == pages)
                 for (APPBean a : appBeans) {
@@ -97,6 +86,7 @@ public class DemoApplication {
         HttpResponse response = httpClient.execute(httpGet);
         Html html = new Html(getHtml(response));
         List<Selectable> nodes = html.xpath(listIndex).nodes();
+        //这里具体解析 html 内容
         return parseHtml(nodes);
     }
 
