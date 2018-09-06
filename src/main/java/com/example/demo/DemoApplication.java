@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.example.demo.Config.ROOTPATH;
+import static com.example.demo.Config.WANDOUJIA_LIST_INDEX;
+import static com.example.demo.Config.WANDOUJIA_PAGE_INDEX;
+
 @SpringBootApplication
 @Controller
 public class DemoApplication {
@@ -42,17 +46,36 @@ public class DemoApplication {
     @RequestMapping("/list")
     @ResponseBody
     public static void list() throws Exception {
-        String listUrl = "https://www.wandoujia.com/search/"+Config.ID;
-        HttpGet httpGet = new HttpGet(listUrl);
+        doWandoujiaRequest(ROOTPATH + Config.KEY_ID, WANDOUJIA_PAGE_INDEX, WANDOUJIA_LIST_INDEX);
+    }
+
+    /**
+     * 360页面请求
+     *
+     * @throws Exception
+     */
+    public static void do360Requst() throws Exception {
+
+
+    }
+
+    /**
+     * 豌豆荚页面请求
+     *
+     * @param indexString  从html数据中获取当前返回数据页数的 indexString，比如：//*ul[@id=j-search-list]/div/div/a[@class=page-item]
+     * @param contentIndex 具体获取apk内容的 关键字符串："//*ul[@id=j-search-list]/li/div[@class=app-desc]"
+     * @throws Exception
+     */
+    public static void doWandoujiaRequest(String rootUrl, String indexString, String contentIndex) throws Exception {
+        HttpGet httpGet = new HttpGet(rootUrl);
         HttpResponse response = httpClient.execute(httpGet);
         Html html = new Html(getHtml(response));
         //获取当前返回数据的页数
-        pages = html.xpath("//*ul[@id=j-search-list]/div/div/a[@class=page-item]").nodes().size() - 2;
-
+        pages = html.xpath(indexString).nodes().size() - 2;
+        appBeans.clear();
         for (int i = 1; i <= pages; i++) {
-            listUrl = "https://www.wandoujia.com/search/"+Config.ID+Config.PAGE + i;
-            doRequest(listUrl);
-
+            String pageUrl = rootUrl + Config.PAGE + i;
+            doRequest(pageUrl, contentIndex);
             if (i == pages)
                 for (APPBean a : appBeans) {
                     System.out.println(a.toString());
@@ -61,15 +84,28 @@ public class DemoApplication {
         System.out.println(appBeans.size());
     }
 
-    public static List<String> doRequest(String url) throws Exception {
+    /**
+     * 获取当前页 apk 的数据
+     *
+     * @param url       当前页的url
+     * @param listIndex 从当前页中获取具体apk数据的关键字符串
+     * @return
+     * @throws Exception
+     */
+    public static List<String> doRequest(String url, String listIndex) throws Exception {
         HttpGet httpGet = new HttpGet(url);
         HttpResponse response = httpClient.execute(httpGet);
         Html html = new Html(getHtml(response));
-        List<Selectable> nodes = html.xpath("//*ul[@id=j-search-list]/li/div[@class=app-desc]").nodes();
+        List<Selectable> nodes = html.xpath(listIndex).nodes();
         return parseHtml(nodes);
     }
 
-
+    /**
+     * 获取当前页面的全部的html的所有数据
+     *
+     * @param response HttpResponse
+     * @return
+     */
     public static String getHtml(HttpResponse response) {
         StringBuffer result = new StringBuffer();
         try (InputStream inputStream = response.getEntity().getContent()) {
@@ -112,7 +148,6 @@ public class DemoApplication {
                         .join(ArrayUtils.toArray(name, number),
                                 ",");
                 trList.add(join);
-
                 appBean.setName(name);
                 appBean.setLoadCount_(number);
                 appBean.setLoadCount(loaderCount);
