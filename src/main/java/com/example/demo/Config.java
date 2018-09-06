@@ -10,8 +10,8 @@ public class Config {
     //获取当前返回的数据页数的 关键字符
     final static String PAGE_INDEX_WANDOUJIA = "//*ul[@id=j-search-list]/div/div/a[@class=page-item]";
     //获取当前页面有多少条数据的 关键字符
-    final static String CONTENT_INDEX_WANDOUJIA_ = "//*ul[@id=j-search-list]/li/div[@class=app-desc]";
-    //详情界面的根路径
+    final static String CONTENT_INDEX_WANDOUJIA = "//*ul[@id=j-search-list]/li/div[@class=app-desc]";
+    //apk类型的关键字
     final static String KEY_ID_WANDOUJIA = "14232182728454798196";
     //同一类型的page前缀
     final static String PAGE_WANDOUJIA = "_page";

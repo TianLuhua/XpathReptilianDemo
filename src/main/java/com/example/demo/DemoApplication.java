@@ -44,7 +44,7 @@ public class DemoApplication {
     @RequestMapping("/list")
     @ResponseBody
     public static void list() throws Exception {
-        dorootRequst(ROOTPATH_WANDOUJIA + Config.KEY_ID_WANDOUJIA, PAGE_INDEX_WANDOUJIA, CONTENT_INDEX_WANDOUJIA_);
+        dorootRequst(ROOTPATH_WANDOUJIA + Config.KEY_ID_WANDOUJIA, PAGE_INDEX_WANDOUJIA, CONTENT_INDEX_WANDOUJIA);
     }
 
 
