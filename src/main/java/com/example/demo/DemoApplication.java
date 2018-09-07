@@ -44,9 +44,77 @@ public class DemoApplication {
     @RequestMapping("/list")
     @ResponseBody
     public static void list() throws Exception {
-//        dorootRequst(ROOTPATH_WANDOUJIA + Config.KEY_ID_WANDOUJIA, PAGE_INDEX_WANDOUJIA, CONTENT_INDEX_WANDOUJIA);
-        get360Page(AppType_360.SIWEI);
+//        doWanduojiaRequst(ROOTPATH_WANDOUJIA + Config.KEY_ID_WANDOUJIA, PAGE_INDEX_WANDOUJIA, CONTENT_INDEX_WANDOUJIA);
+//        get360Page(AppType_360.SIWEI);
+
+        doBaiduRequst();
     }
+
+
+    //========================================百度  start======================================//
+    public static void doBaiduRequst() throws Exception {
+        appBeans.clear();
+        int pagesBaidu = getBaiduPages(ROOTPATH_BAIDU + KEY_ID_BAIDU + PAGE_BAIDU + 1, PAGE_INDEX_BAIDU);
+        System.out.println("===========pagesBaidu=============:" + pagesBaidu);
+        for (int i = 0; i <= pagesBaidu; i++) {
+           String url = "https://shouji.baidu.com/s?data_type=app&multi=0&ajax=1&wd=%E6%80%9D%E7%BB%B4&page=" + i + "&_=1536309334300";//思维
+//                  String url = "https://shouji.baidu.com/s?data_type=app&multi=0&ajax=1&wd=%E7%BB%98%E6%9C%AC&page="+i+"&_=1536310622225";//绘本
+//            String url = "https://shouji.baidu.com/s?data_type=app&multi=0&ajax=1&wd=%E6%97%A9%E6%95%99&page=" + i + "&_=1536310899949";//早教
+//            String url = "https://shouji.baidu.com/s?data_type=app&multi=0&ajax=1&wd=AR&page="+i+"&_=1536311067173";//Ar
+            System.out.println("===========baidu=============:" + url);
+            HttpGet httpGet = new HttpGet(url);
+            HttpResponse response = httpClient.execute(httpGet);
+            Html html = new Html(getHtml(response));
+//            System.out.println(html.toString());
+//            System.out.println("===========baidu=============");
+            List<Selectable> list = html.xpath(CONTENT_INDEX_BAIDU).nodes();
+            System.out.println(list.toString());
+            //解析html数据
+            parseBaiduHtml(list);
+        }
+        for (APPBean a : appBeans) {
+            System.out.println(a.toString());
+        }
+
+    }
+
+    public static int getBaiduPages(String rootUrl, String pageIndex) throws Exception {
+        HttpGet httpGet = new HttpGet(rootUrl);
+        HttpResponse response = httpClient.execute(httpGet);
+        Html html = new Html(getHtml(response));
+        String pagesString = html.xpath(pageIndex).get();
+        System.out.println("pagesString:" + pagesString);
+        return Integer.valueOf(pagesString);
+    }
+
+    public static void parseBaiduHtml(List<Selectable> nodes) {
+        nodes.forEach(node -> {
+            try {
+                String name = node.xpath("//*div[@class=top]/a/text()").get();
+//                System.out.println("name:" + name);
+                String number = node.xpath("//*span[@class=download-num]/text()").get();
+//                System.out.println("number:" + number);
+                APPBean appBean = new APPBean();
+                double loaderCount = getLoaderNumber(number);
+                appBean.setName(name);
+                appBean.setLoadCount_(number);
+                appBean.setLoadCount(loaderCount);
+                appBeans.add(appBean);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        Collections.sort(appBeans, new Comparator<APPBean>() {
+            @Override
+            public int compare(APPBean o1, APPBean o2) {
+                return (o1.getLoadCount() > o2.getLoadCount()) ? -1 : 1;
+            }
+        });
+
+    }
+
+
+//========================================百度  end======================================//
 
 
     public static void get360Page(AppType_360 appType_360) throws Exception {
@@ -116,7 +184,7 @@ public class DemoApplication {
      * @param contentIndex 具体获取apk内容的 关键字符串："//*ul[@id=j-search-list]/li/div[@class=app-desc]"
      * @throws Exception
      */
-    public static void dorootRequst(String rootUrl, String pageIndex, String contentIndex) throws Exception {
+    public static void doWanduojiaRequst(String rootUrl, String pageIndex, String contentIndex) throws Exception {
         HttpGet httpGet = new HttpGet(rootUrl);
         HttpResponse response = httpClient.execute(httpGet);
         Html html = new Html(getHtml(response));

@@ -17,8 +17,18 @@ public class Config {
     final static String PAGE_WANDOUJIA = "_page";
 
     /**
-     * 应用宝相关路径
+     * 百度平台应用相关
      */
+    final static String ROOTPATH_BAIDU = "https://shouji.baidu.com/s?wd=";
+    //获取当前返回的数据页数的 关键字符
+    final static String PAGE_INDEX_BAIDU = "//*form[@class=page-form]/input[@class=total-page]/@value";
+    //获取当前页面有多少条数据的 关键字符
+    final static String CONTENT_INDEX_BAIDU = "//*ul[@class=app-list]/li/";
+    //需要搜索apk的类型关键字
+    final static String KEY_ID_BAIDU = "思维";
+    //同一类型的page前缀
+    final static String PAGE_BAIDU = "#page";
+
 
     /**
      * PAGE_INDEX_WANDOUJIA
