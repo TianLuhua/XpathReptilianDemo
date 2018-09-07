@@ -45,20 +45,69 @@ public class DemoApplication {
     @ResponseBody
     public static void list() throws Exception {
 //        dorootRequst(ROOTPATH_WANDOUJIA + Config.KEY_ID_WANDOUJIA, PAGE_INDEX_WANDOUJIA, CONTENT_INDEX_WANDOUJIA);
-        get360Page();
+        get360Page(AppType_360.SIWEI);
     }
 
 
+    public static void get360Page(AppType_360 appType_360) throws Exception {
+        appBeans.clear();
+        if (appType_360 == null)
+            return;
+        for (int i = 1; i < appType_360.getPages(); i++) {
+            HttpGet httpGet = new HttpGet(ROOTPATH_360 + appType_360.getType() + PAGE_360 + i);
+            HttpResponse response = httpClient.execute(httpGet);
+            Html html = new Html(getHtml(response));
+            System.out.println(html.toString());
+            List<Selectable> list = html.xpath(CONTENT_INDEX_360).nodes();
+            System.out.println(list.size());
+            //解析html数据
+            parse360Html(list);
+        }
+        for (APPBean a : appBeans) {
+            System.out.println(a.toString());
+        }
 
-    public static void get360Page()throws Exception{
-        HttpGet httpGet = new HttpGet(ROOTPATH_360+KEY_ID_360);
-        HttpResponse response = httpClient.execute(httpGet);
-        Html html = new Html(getHtml(response));
-//        System.out.println(html.toString());
-        List<Selectable> list=html.xpath(CONTENT_INDEX_360).nodes();
-        System.out.println("=========================");
-        System.out.println(list.toString());
     }
+
+    private static void parse360Html(List<Selectable> nodes) {
+        nodes.forEach(node -> {
+            try {
+                String name = node.xpath("//*dl/dd/h3/a/@title").get();
+                System.out.println("name:" + name);
+                String detailsPath = "http://zhushou.360.cn" + node.xpath("//*dl/dd/h3/a/@href").get();
+                System.out.println("detailsPath:" + detailsPath);
+                HttpGet httpGet = new HttpGet(detailsPath);
+                HttpResponse response = httpClient.execute(httpGet);
+                Html html = new Html(getHtml(response));
+                APPBean appBean = new APPBean();
+//                System.out.println("detailsPathHtml:" + html);
+                String developer = html.xpath("div[@class=app-moreinfo]/p[4]/text()").get();
+                String version = html.xpath("div[@class=app-moreinfo]/p[5]/text()").get();
+//                System.out.println("details:" + developer);
+                System.out.println("version:" + version);
+                appBean.setDeveloper(developer);
+                appBean.setVersion(version);
+
+                String number = node.xpath("//*div[@class=seaDown]/div/p[@class=downNum]/text()").get();
+                System.out.println("number:" + number);
+                double loaderCount = getLoaderNumber(number);
+                appBean.setName(name);
+                appBean.setLoadCount_(number);
+                appBean.setLoadCount(loaderCount);
+                appBean.setDetailsPath(detailsPath);
+                appBeans.add(appBean);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        Collections.sort(appBeans, new Comparator<APPBean>() {
+            @Override
+            public int compare(APPBean o1, APPBean o2) {
+                return (o1.getLoadCount() > o2.getLoadCount()) ? -1 : 1;
+            }
+        });
+    }
+
 
     /**
      * 豌豆荚页面请求
@@ -188,6 +237,9 @@ public class DemoApplication {
             //如果下载量以万为单位
             loaderNumber = Double.valueOf(temp) * 10000;
 
+        } else if (str.contains(Unit.THOUSAND)) {
+            //如果下载量以千为单位
+            loaderNumber = Double.valueOf(temp) * 1000;
         } else {
             //如果下载量以个为单位
             loaderNumber = Double.valueOf(temp);
